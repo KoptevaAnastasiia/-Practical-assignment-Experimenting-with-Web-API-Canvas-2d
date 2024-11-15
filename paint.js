@@ -1,85 +1,66 @@
-const IDLE = 'idle';
-export const DRAW = 'draw';
-export const ERASE = 'erase';
+export class CanvasAPI {
+    #ctx;
+    #stampImage;
 
-export class Paint {
-    #canvas;
-    #pointerState = IDLE;
-    #mode = DRAW;
-    #color_P = '#000';
-    #size = 7;
+    constructor(element) {
+        this.#ctx = element.getContext("2d");
+        this.#ctx.canvas.width = 800;
+        this.#ctx.canvas.height = 600;
+        this.#ctx.lineCap = "round";
 
-    #path = [];
+        this.#stampImage = new Image();
+        this.#stampImage.src = 'https://ih1.redbubble.net/image.5065733096.9927/st,small,845x845-pad,1000x1000,f8f8f8.u2.jpg';
 
-    #pathCollection = [];
+        this.#stampImage.onload = () => {
+            console.log('Stamp image loaded');
+        };
 
-    constructor(canvas) {
-        this.#canvas = canvas;
+        this.#stampImage.onerror = () => {
+            console.error('Failed to load stamp image');
+        };
+    }
 
-        this.#canvas.element.addEventListener('mousemove', (event) => {
-            const coordinates = this.#recalculateCoordinates(event);
-            switch(this.#pointerState) {
-                case DRAW:
-                    this.#path.push({
-                        ...coordinates,
-                        color: this.#color_P,
-                        width: this.#size,
-                    });
-                    this.#canvas.draw(this.#path);
-                    break
-                case ERASE:
-                    this.#path.push({
-                        ...coordinates,
-                        color: '#fff',
-                        width: 50
-                    });
-                    this.#canvas.draw(this.#path);
-            }
+    draw(path) {
+        if (path.length === 0) {
+            return
+        }
+
+        this.#ctx.beginPath();
+        const [first] = path;
+        this.#ctx.moveTo(first.x, first.y);
+
+        path.forEach(({ x, y, color, width }) => {
+            this.#ctx.lineWidth = width;
+            this.#ctx.strokeStyle = color;
+            this.#ctx.lineTo(x, y)
         })
 
-        this.#canvas.element.addEventListener('mousedown', (event) => {
-            this.#pointerState = this.#mode;
-        })
-
-        this.#canvas.element.addEventListener('mouseup', (event) => {
-            this.#pointerState = IDLE;
-            if (this.#path.length) {
-                this.#pathCollection.push([...this.#path])
-                this.#path = []
-            }
-        })
-
+        this.#ctx.stroke()
+        this.#ctx.closePath();
     }
 
-    setMode(mode) {
-        this.#mode = mode;
+    drawLine(x1, y1, x2, y2, color, width) {
+        this.#ctx.beginPath();
+        this.#ctx.moveTo(x1, y1);
+        this.#ctx.lineTo(x2, y2);
+        this.#ctx.lineWidth = width;
+        this.#ctx.strokeStyle = color;
+        this.#ctx.stroke();
     }
 
-    setColor(color) {
-        this.#color_P = color;
-    }
-
-    setBrushSize(size) {
-        this.#size = size;
-    }
-
-    #recalculateCoordinates({clientX, clientY}) {
-        return {
-            x: clientX - this.#canvas.element.offsetLeft,
-            y: clientY - this.#canvas.element.offsetTop,
+    drawStamp(x, y, size) {
+        if (this.#stampImage.complete) {
+            this.#ctx.drawImage(this.#stampImage, x - size / 2, y - size / 2, size, size);
         }
     }
 
     clean() {
-        this.#canvas.clean()
+        this.#ctx.clearRect(0, 0, this.#ctx.canvas.width, this.#ctx.canvas.height);
     }
 
-    undo() {
-        this.#pathCollection.pop();
-        this.#canvas.clean();
-
-        this.#pathCollection.forEach(path => {
-            this.#canvas.draw(path);
-        })
+    get element() {
+        return this.#ctx.canvas;
     }
+
+
 }

@@ -1,5 +1,5 @@
 import { CanvasAPI } from './canvas.js'
-import { Paint, DRAW, ERASE } from './paint.js'
+import { Paint, DRAW, ERASE, STAMP } from './paint.js'
 
 const canvasElement = document.querySelector('.canvas-js');
 
@@ -15,19 +15,28 @@ cleanButton.addEventListener('click', () => {
 const drawButton = document.querySelector('.draw-button-js');
 const eraseButton = document.querySelector('.erase-button-js');
 const undoButton = document.querySelector('.undo-button-js');
+const stampButton = document.querySelector('.stamp-button-js');
 
 drawButton.addEventListener('click', () => {
     editor.setMode(DRAW)
     drawButton.classList.add('active');
     eraseButton.classList.remove('active');
-})
+    stampButton.classList.remove('active');
+});
 
 eraseButton.addEventListener('click', () => {
     editor.setMode(ERASE)
     drawButton.classList.remove('active');
     eraseButton.classList.add('active');
+    stampButton.classList.remove('active');
 })
 
+stampButton.addEventListener('click', () => {
+    editor.setMode(STAMP);
+    stampButton.classList.add('active');
+    drawButton.classList.remove('active');
+    eraseButton.classList.remove('active');
+});
 
 undoButton.addEventListener('click', () => {
     editor.undo()
@@ -44,7 +53,6 @@ colorInput.addEventListener('input', (event) => {
 
 const brushSizeInput = document.querySelector('#brush-size');
 const brushSizeValue = document.querySelector('#brush-size-value');
-
 
 
 

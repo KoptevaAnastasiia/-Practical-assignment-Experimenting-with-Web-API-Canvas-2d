@@ -11,12 +11,11 @@
 <body>
 
 <div class="app">
-
     <div class="additional_panel">
-        <button for="color-input"> Color: </button>
+        <button for="color-input">Color:</button>
         <input type="color" id="color-input" name="color-input" value="#000000">
 
-        <button for="brush-size">Brush Size: </button>
+        <button for="brush-size">Brush Size:</button>
         <input type="range" id="brush-size" name="brush-size" min="1" max="50" value="7">
         <span id="brush-size-value">7</span>
     </div>
@@ -29,6 +28,11 @@
         <button class="undo-button-js">↩️</button>
         <button class="clean-button-js">C️</button>
     </div>
+
+    <div class="additional-panel">
+        <button class="stamp-button-js">Stamp</button>
+    </div>
+
     <div class="canvas">
         <canvas class="canvas-js"></canvas>
     </div>
